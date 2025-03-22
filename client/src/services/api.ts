@@ -1,8 +1,18 @@
 import axios from 'axios';
 
+// Determine the base URL based on the environment
+const getBaseUrl = () => {
+  // In production (Vercel), use the Render backend URL
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://lms-backend.onrender.com/api'; // Replace with your actual Render URL
+  }
+  // In development, use the proxy defined in package.json
+  return 'http://localhost:3001/api';
+};
+
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
