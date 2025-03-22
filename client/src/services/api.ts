@@ -2,9 +2,9 @@ import axios from 'axios';
 
 // Determine the base URL based on the environment
 const getBaseUrl = () => {
-  // In production (Vercel), use the Render backend URL
+  // In Docker production environment, use the service name
   if (process.env.NODE_ENV === 'production') {
-    return 'https://lms-backend.onrender.com/api'; // Replace with your actual Render URL
+    return '/api'; // Nginx will proxy this to the backend service
   }
   // In development, use the proxy defined in package.json
   return 'http://localhost:3001/api';

@@ -1,143 +1,104 @@
-# Centered Support Service Training LMS
+# Learning Management System (LMS)
 
-A Learning Management System (LMS) for a home health agency supporting people with developmental disabilities.
+A full-stack Learning Management System built with React, Node.js, Express, and MongoDB.
 
-## Project Overview
+## Features
 
-This LMS provides training modules for support staff working with individuals with developmental disabilities. The system includes comprehensive learning materials with videos, text content, audio clips, and assessments.
+- User authentication and authorization
+- Course management
+- Section and content organization
+- Interactive exercises and quizzes
+- Progress tracking
+- Admin dashboard
 
-### Key Learning Sections
+## Prerequisites
 
-1. Introduction to the Role
-2. Understanding Client Needs and Preferences
-3. Key Responsibilities of Support Staff
-4. Communication and Professionalism
-5. Infection Control and Hygiene Practices
-6. Emergency Procedures and Crisis Management
-7. 6 Rights of Medication Administration
+- [Docker](https://www.docker.com/get-started) and Docker Compose
+- MongoDB Atlas account (or local MongoDB instance)
 
-Each section includes:
+## Getting Started
 
-- Video content
-- Text-based learning materials
-- Audio clips
-- Assessment quizzes
+### Environment Setup
 
-## Tech Stack
-
-- **Backend**: Node.js with Express and TypeScript
-- **Database**: MongoDB
-- **Authentication**: JWT (JSON Web Tokens)
-- **Frontend**: React with TypeScript (to be implemented)
-
-## Project Structure
-
-```
-lms/
-├── src/                      # Source code
-│   ├── config/               # Configuration files
-│   ├── controllers/          # API controllers
-│   ├── middleware/           # Middleware functions
-│   ├── models/               # Database models
-│   ├── routes/               # API routes
-│   ├── utils/                # Utility functions
-│   ├── public/               # Static files (videos, audio, images)
-│   │   ├── videos/           # Video content
-│   │   ├── audio/            # Audio content
-│   │   └── images/           # Images
-│   ├── views/                # View templates
-│   └── index.ts              # Application entry point
-├── dist/                     # Compiled JavaScript files
-├── node_modules/             # Dependencies
-├── .env                      # Environment variables
-├── package.json              # Project metadata and dependencies
-├── tsconfig.json             # TypeScript configuration
-└── README.md                 # Project documentation
-```
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- MongoDB (local installation or MongoDB Atlas account)
-
-### Installation
-
-1. Clone the repository:
-
+1. Clone this repository
+2. Copy the `.env.example` file to `.env`:
    ```
-   git clone <repository-url>
-   cd lms
+   cp .env.example .env
    ```
-2. Install dependencies:
+3. Update the `.env` file with your MongoDB connection string and JWT secret:
+   ```
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   ```
 
+### Running with Docker
+
+1. Build and start the containers:
+   ```
+   docker-compose up -d
+   ```
+
+2. Access the application:
+   - Frontend: http://localhost
+   - Backend API: http://localhost:3001
+
+3. Stop the containers:
+   ```
+   docker-compose down
+   ```
+
+### Development Setup
+
+#### Backend
+
+1. Install dependencies:
    ```
    npm install
    ```
-3. Set up environment variables:
-   Create a `.env` file in the root directory with the following variables:
 
+2. Start the development server:
    ```
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/home-health-lms
-   JWT_SECRET=your_jwt_secret_key_here
-   NODE_ENV=development
+   npm run dev
    ```
-4. Seed the database with initial data:
 
-   ```
-   npm run seed
-   ```
-5. Build the application:
+#### Frontend
 
+1. Navigate to the client directory:
    ```
-   npm run build
+   cd client
    ```
-6. Start the server:
 
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
    ```
    npm start
    ```
 
-## API Endpoints
+## Project Structure
 
-### Authentication
+- `/client` - React frontend
+- `/src` - Node.js/Express backend
+  - `/controllers` - Request handlers
+  - `/middleware` - Express middleware
+  - `/models` - Mongoose models
+  - `/routes` - API routes
+  - `/utils` - Utility functions
+- `/quizzes` - Quiz content and configuration
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user profile
+## Deployment
 
-### Courses
+The application can be deployed using Docker to any cloud provider that supports Docker containers, such as:
 
-- `GET /api/courses` - Get all courses
-- `GET /api/courses/:id` - Get a single course
-- `POST /api/courses` - Create a new course (admin/instructor only)
-- `PUT /api/courses/:id` - Update a course
-- `DELETE /api/courses/:id` - Delete a course
-
-### Sections
-
-- `GET /api/sections/course/:courseId` - Get all sections for a course
-- `GET /api/sections/:id` - Get a single section
-- `POST /api/sections` - Create a new section (admin/instructor only)
-- `PUT /api/sections/:id` - Update a section
-- `DELETE /api/sections/:id` - Delete a section
-
-### Quizzes
-
-- `GET /api/quizzes/:id` - Get a quiz
-- `POST /api/quizzes` - Create a new quiz (admin/instructor only)
-- `PUT /api/quizzes/:id` - Update a quiz
-- `DELETE /api/quizzes/:id` - Delete a quiz
-- `POST /api/quizzes/:quizId/submit` - Submit a quiz attempt
-
-### Progress
-
-- `GET /api/progress` - Get user progress for all courses
-- `GET /api/progress/course/:courseId` - Get user progress for a specific course
-- `PUT /api/progress/course/:courseId/section/:sectionId` - Update section progress
+- AWS ECS
+- Google Cloud Run
+- Azure Container Instances
+- DigitalOcean App Platform
+- Heroku
 
 ## License
 
-[MIT License](LICENSE)
+This project is licensed under the MIT License.

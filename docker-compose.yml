@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lms-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - MONGODB_URI=${MONGODB_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - lms-network
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: lms-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - lms-network
+
+networks:
+  lms-network:
+    driver: bridge
