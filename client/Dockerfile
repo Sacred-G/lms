@@ -1,13 +1,16 @@
+# Build stage
 FROM node:18-alpine as build
 
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install --production=false
 
-# Copy the rest of the application
-COPY . .
+# Copy only necessary files for the build
+COPY public/ ./public/
+COPY src/ ./src/
+COPY tsconfig.json ./
 
 # Build the React app
 RUN npm run build
