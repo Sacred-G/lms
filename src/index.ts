@@ -24,7 +24,18 @@ const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+// Configure CORS to allow requests from your Vercel frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',  // Local frontend development
+    'https://lms-kd3qq4qiw-sacredgs-projects.vercel.app', // Your Vercel deployment URL
+    /\.vercel\.app$/ // Allow all vercel.app subdomains (for future deployments)
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
