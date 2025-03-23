@@ -17,8 +17,7 @@ npm run build
 echo "Creating necessary directories..."
 mkdir -p dist/quizzes
 
-# Copy quizzes to dist directory
-echo "Copying quizzes to dist directory..."
-cp -r quizzes/* dist/quizzes/
+# No need to copy quizzes as they will be compiled by TypeScript
+echo "Quizzes will be compiled by TypeScript..."
 
 echo "Build completed successfully!"

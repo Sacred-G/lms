@@ -33,15 +33,15 @@ const connectDB = async () => {
 connectDB();
 
 // Import routes
-const authRoutes = require('../dist/routes/auth.routes');
-const courseRoutes = require('../dist/routes/course.routes');
-const sectionRoutes = require('../dist/routes/section.routes');
-const quizRoutes = require('../dist/routes/quiz.routes');
-const progressRoutes = require('../dist/routes/progress.routes');
-const interactiveRoutes = require('../dist/routes/interactive.routes');
-const uploadRoutes = require('../dist/routes/upload.routes');
-const adminRoutes = require('../dist/routes/admin.routes');
-const userRoutes = require('../dist/routes/user.routes');
+const authRoutes = require('../dist/src/routes/auth.routes');
+const courseRoutes = require('../dist/src/routes/course.routes');
+const sectionRoutes = require('../dist/src/routes/section.routes');
+const quizRoutes = require('../dist/src/routes/quiz.routes');
+const progressRoutes = require('../dist/src/routes/progress.routes');
+const interactiveRoutes = require('../dist/src/routes/interactive.routes');
+const uploadRoutes = require('../dist/src/routes/upload.routes');
+const adminRoutes = require('../dist/src/routes/admin.routes');
+const userRoutes = require('../dist/src/routes/user.routes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
