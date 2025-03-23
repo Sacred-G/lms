@@ -37,6 +37,8 @@ const Dashboard: React.FC = () => {
 
   // Calculate progress percentage for each course
   const calculateProgress = (courseId: string) => {
+    if (!Array.isArray(progress)) return 0;
+    
     const courseProgress = progress.find(p => p.course._id === courseId);
     if (!courseProgress) return 0;
     
@@ -118,7 +120,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div>
                   <Badge bg="primary" className="px-3 py-2">
-                    {progress.length} {progress.length === 1 ? 'Course' : 'Courses'} Enrolled
+                    {Array.isArray(progress) ? progress.length : 0} {Array.isArray(progress) && progress.length === 1 ? 'Course' : 'Courses'} Enrolled
                   </Badge>
                 </div>
               </div>
@@ -130,7 +132,7 @@ const Dashboard: React.FC = () => {
       {/* Course List */}
       <h3 className="mb-3">Your Courses</h3>
       <Row>
-        {courses.length === 0 ? (
+        {!Array.isArray(courses) || courses.length === 0 ? (
           <Col>
             <p>No courses available at the moment.</p>
           </Col>
