@@ -60,6 +60,7 @@ const RolePlayExerciseComponent: React.FC<RolePlayExerciseProps> = ({ exerciseId
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleStartRolePlay = () => {
     // Start the role play exercise
     setEvaluationMode(false);

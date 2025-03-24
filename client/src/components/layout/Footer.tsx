@@ -58,13 +58,13 @@ const Footer: React.FC = () => {
             <h5 className="text-uppercase mb-4 fw-bold">Resources</h5>
             <ul className="list-unstyled">
               <li className="mb-3">
-                <a href="#" className="text-decoration-none text-light">Training Materials</a>
+                <a href="/resources/training" className="text-decoration-none text-light">Training Materials</a>
               </li>
               <li className="mb-3">
-                <a href="#" className="text-decoration-none text-light">Best Practices</a>
+                <a href="/resources/best-practices" className="text-decoration-none text-light">Best Practices</a>
               </li>
               <li>
-                <a href="#" className="text-decoration-none text-light">Support Guidelines</a>
+                <a href="/resources/support" className="text-decoration-none text-light">Support Guidelines</a>
               </li>
             </ul>
           </Col>

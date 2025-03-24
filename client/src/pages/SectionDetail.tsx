@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Nav, Button, Alert } from 'react-bootstrap';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Container, Card, Nav, Button, Alert } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import { sectionService } from '../services/sectionService';
 import { quizService } from '../services/quizService';
