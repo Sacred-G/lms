@@ -6,9 +6,19 @@ import Section from '../models/section.model';
 // Get user progress for all courses
 export const getUserProgress = async (req: Request, res: Response): Promise<void> => {
   try {
-    const progress = await Progress.find({ user: req.user?.id })
+    let progress = await Progress.find({ user: req.user?.id })
       .populate('course', 'title description')
       .populate('sectionsProgress.section', 'title');
+    
+    // Filter out progress for supervisor course if user doesn't have appropriate role
+    if (req.user && req.user.role !== 'admin' && req.user.role !== 'instructor') {
+      progress = progress.filter(p => {
+        if (p.course && typeof p.course === 'object' && 'title' in p.course) {
+          return p.course.title !== 'Supervisor Training';
+        }
+        return true;
+      });
+    }
     
     res.status(200).json(progress);
   } catch (error: any) {
@@ -25,6 +35,17 @@ export const getSectionProgress = async (req: Request, res: Response): Promise<v
     const course = await Course.findById(courseId);
     if (!course) {
       res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this course' });
       return;
     }
     
@@ -91,6 +112,17 @@ export const getUserCourseProgress = async (req: Request, res: Response): Promis
       return;
     }
     
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this course' });
+      return;
+    }
+    
     // Get or create progress
     let progress = await Progress.findOne({
       user: req.user?.id,
@@ -136,6 +168,17 @@ export const updateSectionProgress = async (req: Request, res: Response): Promis
     const course = await Course.findById(courseId);
     if (!course) {
       res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this course' });
       return;
     }
     

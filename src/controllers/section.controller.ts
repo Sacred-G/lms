@@ -6,10 +6,20 @@ import Quiz from '../models/quiz.model';
 // Get all sections
 export const getAllSections = async (req: Request, res: Response): Promise<void> => {
   try {
-    const sections = await Section.find()
+    let sections = await Section.find()
       .sort({ course: 1, order: 1 })
       .populate('course', 'title')
       .populate('quiz');
+    
+    // Filter out sections from supervisor course if user doesn't have appropriate role
+    if (req.user && req.user.role !== 'admin' && req.user.role !== 'instructor') {
+      sections = sections.filter(section => {
+        if (section.course && typeof section.course === 'object' && 'title' in section.course) {
+          return section.course.title !== 'Supervisor Training';
+        }
+        return true;
+      });
+    }
     
     res.status(200).json(sections);
   } catch (error: any) {
@@ -21,6 +31,24 @@ export const getAllSections = async (req: Request, res: Response): Promise<void>
 export const getSectionsByCourse = async (req: Request, res: Response): Promise<void> => {
   try {
     const { courseId } = req.params;
+    
+    // Check if this is the supervisor course
+    const course = await Course.findById(courseId);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this course' });
+      return;
+    }
     
     const sections = await Section.find({ course: courseId })
       .sort({ order: 1 })
@@ -39,6 +67,24 @@ export const getSectionById = async (req: Request, res: Response): Promise<void>
     
     if (!section) {
       res.status(404).json({ message: 'Section not found' });
+      return;
+    }
+    
+    // Check if this section belongs to the supervisor course
+    const course = await Course.findById(section.course);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this section' });
       return;
     }
     

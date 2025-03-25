@@ -1,10 +1,34 @@
 import { Request, Response } from 'express';
 import { Scenario, DragDropExercise, RolePlayExercise } from '../models/interactive.model';
+import Section from '../models/section.model';
+import Course from '../models/course.model';
 
 // Scenario Controllers
 export const getSectionScenarios = async (req: Request, res: Response) => {
   try {
     const { sectionId } = req.params;
+    
+    // Check if this section belongs to the supervisor course
+    const section = await Section.findById(sectionId);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this section' });
+    }
+    
     const scenarios = await Scenario.find({ section: sectionId });
     res.status(200).json(scenarios);
   } catch (error) {
@@ -21,6 +45,27 @@ export const getScenarioById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Scenario not found' });
     }
     
+    // Check if this scenario belongs to a section in the supervisor course
+    const section = await Section.findById(scenario.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this scenario' });
+    }
+    
     res.status(200).json(scenario);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching scenario', error });
@@ -35,6 +80,27 @@ export const submitScenarioAttempt = async (req: Request, res: Response) => {
     const scenario = await Scenario.findById(scenarioId);
     if (!scenario) {
       return res.status(404).json({ message: 'Scenario not found' });
+    }
+    
+    // Check if this scenario belongs to a section in the supervisor course
+    const section = await Section.findById(scenario.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to submit this scenario' });
     }
     
     // Calculate score based on correct responses
@@ -61,6 +127,28 @@ export const submitScenarioAttempt = async (req: Request, res: Response) => {
 export const getSectionDragDropExercises = async (req: Request, res: Response) => {
   try {
     const { sectionId } = req.params;
+    
+    // Check if this section belongs to the supervisor course
+    const section = await Section.findById(sectionId);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this section' });
+    }
+    
     const exercises = await DragDropExercise.find({ section: sectionId });
     res.status(200).json(exercises);
   } catch (error) {
@@ -77,6 +165,27 @@ export const getDragDropExerciseById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Drag & drop exercise not found' });
     }
     
+    // Check if this exercise belongs to a section in the supervisor course
+    const section = await Section.findById(exercise.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this exercise' });
+    }
+    
     res.status(200).json(exercise);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching drag & drop exercise', error });
@@ -91,6 +200,27 @@ export const submitDragDropAttempt = async (req: Request, res: Response) => {
     const exercise = await DragDropExercise.findById(exerciseId);
     if (!exercise) {
       return res.status(404).json({ message: 'Drag & drop exercise not found' });
+    }
+    
+    // Check if this exercise belongs to a section in the supervisor course
+    const section = await Section.findById(exercise.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to submit this exercise' });
     }
     
     // Generate feedback for each item
@@ -132,6 +262,28 @@ export const submitDragDropAttempt = async (req: Request, res: Response) => {
 export const getSectionRolePlayExercises = async (req: Request, res: Response) => {
   try {
     const { sectionId } = req.params;
+    
+    // Check if this section belongs to the supervisor course
+    const section = await Section.findById(sectionId);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this section' });
+    }
+    
     const exercises = await RolePlayExercise.find({ section: sectionId });
     res.status(200).json(exercises);
   } catch (error) {
@@ -148,6 +300,27 @@ export const getRolePlayExerciseById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Role play exercise not found' });
     }
     
+    // Check if this exercise belongs to a section in the supervisor course
+    const section = await Section.findById(exercise.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to access this exercise' });
+    }
+    
     res.status(200).json(exercise);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching role play exercise', error });
@@ -162,6 +335,27 @@ export const submitRolePlayEvaluation = async (req: Request, res: Response) => {
     const exercise = await RolePlayExercise.findById(exerciseId);
     if (!exercise) {
       return res.status(404).json({ message: 'Role play exercise not found' });
+    }
+    
+    // Check if this exercise belongs to a section in the supervisor course
+    const section = await Section.findById(exercise.section);
+    if (!section) {
+      return res.status(404).json({ message: 'Section not found' });
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      return res.status(403).json({ message: 'Not authorized to submit this evaluation' });
     }
     
     // Calculate weighted score

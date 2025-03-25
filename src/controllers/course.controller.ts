@@ -5,7 +5,12 @@ import Section from '../models/section.model';
 // Get all courses
 export const getAllCourses = async (req: Request, res: Response): Promise<void> => {
   try {
-    const courses = await Course.find().populate('createdBy', 'name');
+    let courses = await Course.find().populate('createdBy', 'name');
+    
+    // Filter out supervisor course if user is not a supervisor
+    if (req.user && req.user.role !== 'admin' && req.user.role !== 'instructor') {
+      courses = courses.filter(course => course.title !== 'Supervisor Training');
+    }
     
     res.status(200).json(courses);
   } catch (error: any) {
@@ -25,6 +30,17 @@ export const getCourseById = async (req: Request, res: Response): Promise<void> 
     
     if (!course) {
       res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this course' });
       return;
     }
     

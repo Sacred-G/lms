@@ -16,6 +16,24 @@ export const getQuizBySection = async (req: Request, res: Response): Promise<voi
       return;
     }
     
+    // Check if this section belongs to the supervisor course
+    const course = await Course.findById(section.course);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this quiz' });
+      return;
+    }
+    
     // Find quiz for this section
     const quiz = await Quiz.findOne({ section: sectionId });
     
@@ -37,6 +55,30 @@ export const getQuizById = async (req: Request, res: Response): Promise<void> =>
     
     if (!quiz) {
       res.status(404).json({ message: 'Quiz not found' });
+      return;
+    }
+    
+    // Check if this quiz belongs to a section in the supervisor course
+    const section = await Section.findById(quiz.section);
+    if (!section) {
+      res.status(404).json({ message: 'Section not found' });
+      return;
+    }
+    
+    const course = await Course.findById(section.course);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to access this quiz' });
       return;
     }
     
@@ -195,6 +237,32 @@ export const submitQuizAttempt = async (req: Request, res: Response): Promise<vo
       return;
     }
     
+    // Get section and course
+    const section = await Section.findById(quiz.section);
+    
+    if (!section) {
+      res.status(404).json({ message: 'Section not found' });
+      return;
+    }
+    
+    // Check if this section belongs to the supervisor course
+    const course = await Course.findById(section.course);
+    if (!course) {
+      res.status(404).json({ message: 'Course not found' });
+      return;
+    }
+    
+    // Check if this is the supervisor course and user doesn't have appropriate role
+    if (
+      course.title === 'Supervisor Training' && 
+      req.user && 
+      req.user.role !== 'admin' && 
+      req.user.role !== 'instructor'
+    ) {
+      res.status(403).json({ message: 'Not authorized to submit this quiz' });
+      return;
+    }
+    
     // Calculate score
     let correctAnswers = 0;
     
@@ -206,14 +274,6 @@ export const submitQuizAttempt = async (req: Request, res: Response): Promise<vo
     
     const score = Math.round((correctAnswers / quiz.questions.length) * 100);
     const passed = score >= quiz.passingScore;
-    
-    // Get section and course
-    const section = await Section.findById(quiz.section);
-    
-    if (!section) {
-      res.status(404).json({ message: 'Section not found' });
-      return;
-    }
     
     // Update user progress
     let progress = await Progress.findOne({
