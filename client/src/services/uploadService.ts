@@ -15,6 +15,16 @@ export const uploadService = {
     return response.data;
   },
   
+  // Register external audio URL (like Google Drive)
+  registerExternalAudioUrl: async (url: string, fileName: string): Promise<{ url: string; fileName: string; originalName: string }> => {
+    const response = await api.post('/upload/external-audio', {
+      url,
+      fileName
+    });
+    
+    return response.data;
+  },
+  
   // Upload video file
   uploadVideo: async (file: File): Promise<{ url: string; fileName: string; originalName: string }> => {
     const formData = new FormData();
@@ -24,6 +34,16 @@ export const uploadService = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+    });
+    
+    return response.data;
+  },
+  
+  // Register external video URL (like Google Drive)
+  registerExternalVideoUrl: async (url: string, fileName: string): Promise<{ url: string; fileName: string; originalName: string }> => {
+    const response = await api.post('/upload/external-video', {
+      url,
+      fileName
     });
     
     return response.data;

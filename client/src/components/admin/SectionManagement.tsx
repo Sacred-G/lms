@@ -22,6 +22,11 @@ const SectionManagement: React.FC = () => {
   const [videoUrl, setVideoUrl] = useState('');
   const [uploadingAudio, setUploadingAudio] = useState(false);
   
+  // External URL options
+  const [useExternalAudioUrl, setUseExternalAudioUrl] = useState(false);
+  const [externalAudioUrl, setExternalAudioUrl] = useState('');
+  const [externalAudioName, setExternalAudioName] = useState('');
+  
   // Available audio files
   const [availableAudioFiles, setAvailableAudioFiles] = useState<string[]>([]);
   const [selectedExistingAudio, setSelectedExistingAudio] = useState('');
@@ -89,16 +94,39 @@ const SectionManagement: React.FC = () => {
       
       let audioUrl = editSection.audioUrl;
       
-      // If a new audio file is selected, upload it
-      if (audioFile) {
-        setUploadingAudio(true);
+      setUploadingAudio(true);
+      
+      // Handle different audio source options
+      if (useExternalAudioUrl) {
+        // If using external URL
+        if (!externalAudioUrl || !externalAudioName) {
+          setError('External URL and name are required');
+          setUploadingAudio(false);
+          return;
+        }
+        
+        try {
+          const result = await uploadService.registerExternalAudioUrl(
+            externalAudioUrl,
+            externalAudioName
+          );
+          audioUrl = result.url;
+        } catch (err) {
+          console.error('Failed to register external URL:', err);
+          setError('Failed to register external URL. Make sure it is accessible.');
+          setUploadingAudio(false);
+          return;
+        }
+      } else if (audioFile) {
+        // If a new audio file is selected, upload it
         const uploadResult = await uploadService.uploadAudio(audioFile);
         audioUrl = uploadResult.url;
-        setUploadingAudio(false);
       } else if (selectedExistingAudio) {
         // If an existing audio file is selected
         audioUrl = selectedExistingAudio;
       }
+      
+      setUploadingAudio(false);
       
       // Update section with new audio and video URLs
       const updatedSection = await sectionService.updateSection(editSection._id, {
@@ -224,32 +252,73 @@ const SectionManagement: React.FC = () => {
               <Form.Group className="mb-3">
                 <Form.Label>Audio File</Form.Label>
                 
-                <div className="mb-2">
-                  <Form.Label>Select Existing Audio File</Form.Label>
-                  <Form.Select
-                    value={selectedExistingAudio}
-                    onChange={handleExistingAudioChange}
-                  >
-                    <option value="">-- Select an existing audio file --</option>
-                    {availableAudioFiles.map((file, index) => (
-                      <option key={index} value={file}>
-                        {file.split('/').pop()}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </div>
+                <Form.Check
+                  type="checkbox"
+                  id="use-external-audio"
+                  label="Use external audio URL (e.g., Google Drive)"
+                  checked={useExternalAudioUrl}
+                  onChange={(e) => setUseExternalAudioUrl(e.target.checked)}
+                  className="mb-3"
+                />
                 
-                <div className="mb-2">
-                  <Form.Label>Or Upload New Audio File</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleAudioFileChange}
-                  />
-                  <Form.Text className="text-muted">
-                    Supported formats: WAV, MP3, OGG
-                  </Form.Text>
-                </div>
+                {useExternalAudioUrl ? (
+                  <div className="mb-3 border p-3 rounded">
+                    <Form.Group className="mb-2">
+                      <Form.Label>External Audio URL</Form.Label>
+                      <Form.Control
+                        type="url"
+                        placeholder="Enter Google Drive or other external URL"
+                        value={externalAudioUrl}
+                        onChange={(e) => setExternalAudioUrl(e.target.value)}
+                      />
+                      <Form.Text className="text-muted">
+                        Enter a direct link to an audio file (must be publicly accessible)
+                      </Form.Text>
+                    </Form.Group>
+                    
+                    <Form.Group>
+                      <Form.Label>Audio File Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter a name for this audio file"
+                        value={externalAudioName}
+                        onChange={(e) => setExternalAudioName(e.target.value)}
+                      />
+                      <Form.Text className="text-muted">
+                        This name will be used to identify the audio file in the system
+                      </Form.Text>
+                    </Form.Group>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-2">
+                      <Form.Label>Select Existing Audio File</Form.Label>
+                      <Form.Select
+                        value={selectedExistingAudio}
+                        onChange={handleExistingAudioChange}
+                      >
+                        <option value="">-- Select an existing audio file --</option>
+                        {availableAudioFiles.map((file, index) => (
+                          <option key={index} value={file}>
+                            {file.split('/').pop()}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </div>
+                    
+                    <div className="mb-2">
+                      <Form.Label>Or Upload New Audio File</Form.Label>
+                      <Form.Control
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleAudioFileChange}
+                      />
+                      <Form.Text className="text-muted">
+                        Supported formats: WAV, MP3, OGG
+                      </Form.Text>
+                    </div>
+                  </>
+                )}
                 
                 {editSection.audioUrl && (
                   <div className="mt-2">

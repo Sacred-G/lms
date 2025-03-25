@@ -1,7 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import { uploadAudio, uploadVideo } from '../controllers/upload.controller';
+import { 
+  uploadAudio, 
+  uploadVideo, 
+  registerExternalAudioUrl, 
+  registerExternalVideoUrl 
+} from '../controllers/upload.controller';
 import { protect, restrictTo } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -25,10 +30,12 @@ const upload = multer({ storage: storage });
 router.use(protect);
 router.use(restrictTo('admin'));
 
-// Audio upload route
+// Audio upload routes
 router.post('/audio', upload.single('audio'), uploadAudio);
+router.post('/external-audio', registerExternalAudioUrl);
 
-// Video upload route
+// Video upload routes
 router.post('/video', upload.single('video'), uploadVideo);
+router.post('/external-video', registerExternalVideoUrl);
 
 export default router;
