@@ -44,16 +44,24 @@ const SectionDetail: React.FC<SectionDetailProps> = () => {
       
       try {
         setLoading(true);
-        const [sectionData, quizData, progressData] = await Promise.all([
-          sectionService.getSectionById(sectionId),
-          quizService.getSectionQuiz(sectionId),
-          progressService.getSectionProgress(courseId, sectionId)
-        ]);
         
+        // Get section data
+        const sectionData = await sectionService.getSectionById(sectionId);
         setSection(sectionData);
-        setQuiz(quizData);
+        
+        // Get progress data
+        const progressData = await progressService.getSectionProgress(courseId, sectionId);
         setSectionProgress(progressData);
         setSectionCompleted(progressData?.completed || false);
+        
+        // Try to get quiz data, but don't fail if not found
+        try {
+          const quizData = await quizService.getSectionQuiz(sectionId);
+          setQuiz(quizData);
+        } catch (quizErr) {
+          console.log('No quiz found for this section or error loading quiz:', quizErr);
+          // Don't set error state for quiz not found
+        }
         
         // Fetch interactive learning elements
         try {
@@ -251,6 +259,148 @@ const SectionDetail: React.FC<SectionDetailProps> = () => {
     );
   }
 
+  // Render quiz content based on availability
+  const renderQuizContent = () => {
+    if (!quiz) {
+      return (
+        <Card className="mb-4">
+          <Card.Body className="text-center py-5">
+            <h4>No Quiz Available</h4>
+            <p className="mt-3">
+              There is currently no quiz available for this section.
+            </p>
+            {!sectionCompleted && (
+              <div className="d-flex justify-content-center mt-4">
+                <Button variant="primary" onClick={handleMarkCompleted}>
+                  Mark Section as Completed
+                </Button>
+              </div>
+            )}
+          </Card.Body>
+        </Card>
+      );
+    }
+
+    if (!isQuizAvailable()) {
+      return (
+        <div className="text-center py-5">
+          <div className="mb-4">
+            <i className="bi bi-lock-fill" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+          </div>
+          <h4>Quiz Locked</h4>
+          <p className="mt-3">
+            You need to complete the following before accessing the quiz:
+          </p>
+          <ul className="list-group mt-3 mb-4 mx-auto" style={{ maxWidth: '400px' }}>
+            {section.videoUrl && sectionProgress && !sectionProgress.videoWatched && (
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span>Watch the video</span>
+                <span className="badge bg-secondary rounded-pill">
+                  <i className="bi bi-x-lg"></i>
+                </span>
+              </li>
+            )}
+            {section.audioUrl && sectionProgress && !sectionProgress.audioListened && (
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span>Listen to the audio</span>
+                <span className="badge bg-secondary rounded-pill">
+                  <i className="bi bi-x-lg"></i>
+                </span>
+              </li>
+            )}
+          </ul>
+          <Button 
+            variant="outline-primary" 
+            onClick={() => {
+              if (section.videoUrl && sectionProgress && !sectionProgress.videoWatched) {
+                setActiveTab('video');
+              } else if (section.audioUrl && sectionProgress && !sectionProgress.audioListened) {
+                setActiveTab('audio');
+              }
+            }}
+          >
+            Go to {section.videoUrl && sectionProgress && !sectionProgress.videoWatched ? 'Video' : 'Audio'} Content
+          </Button>
+        </div>
+      );
+    }
+
+    if (quizSubmitted) {
+      return (
+        <div className="quiz-results text-center py-4">
+          <h4>Quiz Results</h4>
+          <p className="lead">Your score: {quizScore}%</p>
+          
+          {quizScore !== null && quizScore >= 70 ? (
+            <Alert variant="success">
+              <Alert.Heading>Congratulations!</Alert.Heading>
+              <p>You have passed the quiz.</p>
+            </Alert>
+          ) : (
+            <Alert variant="warning">
+              <Alert.Heading>Almost there!</Alert.Heading>
+              <p>You need a score of at least 70% to pass. Please try again.</p>
+            </Alert>
+          )}
+          
+          <Button 
+            variant="primary" 
+            onClick={() => {
+              setQuizSubmitted(false);
+              setQuizAnswers({});
+              setQuizScore(null);
+            }}
+            className="mt-3"
+          >
+            Retake Quiz
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="quiz-questions">
+        <h4 className="mb-4">{quiz.title}</h4>
+        <p className="mb-4">{quiz.description}</p>
+        
+        <form>
+          {quiz.questions && quiz.questions.length > 0 ? (
+            quiz.questions.map((question, index) => (
+              <div key={question._id || index} className="mb-4">
+                <h5>{index + 1}. {question.text}</h5>
+                <div className="mt-2">
+                  {Array.isArray(question.options) ? 
+                    question.options.map((option, optIndex) => renderQuizOption(question, option, optIndex)) :
+                    <p>No options available for this question.</p>
+                  }
+                </div>
+                {question.explanation && (
+                  <div className="mt-2 text-muted">
+                    <small><strong>Explanation:</strong> {question.explanation}</small>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="alert alert-warning">
+              No questions available for this quiz.
+            </div>
+          )}
+          
+          <div className="d-flex justify-content-end mt-4">
+            <Button 
+              variant="primary" 
+              onClick={handleQuizSubmit}
+              disabled={Object.keys(quizAnswers).length < (quiz.questions?.length || 0)}
+            >
+              Submit Quiz
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  };
+
   return (
     <Container className="py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -343,121 +493,9 @@ const SectionDetail: React.FC<SectionDetailProps> = () => {
             </div>
           )}
           
-          {activeTab === 'quiz' && quiz && (
+          {activeTab === 'quiz' && (
             <div className="section-quiz-content">
-              {isQuizAvailable() ? (
-                quizSubmitted ? (
-                  <div className="quiz-results text-center py-4">
-                    <h4>Quiz Results</h4>
-                    <p className="lead">Your score: {quizScore}%</p>
-                    
-                    {quizScore !== null && quizScore >= 70 ? (
-                      <Alert variant="success">
-                        <Alert.Heading>Congratulations!</Alert.Heading>
-                        <p>You have passed the quiz.</p>
-                      </Alert>
-                    ) : (
-                      <Alert variant="warning">
-                        <Alert.Heading>Almost there!</Alert.Heading>
-                        <p>You need a score of at least 70% to pass. Please try again.</p>
-                      </Alert>
-                    )}
-                    
-                    <Button 
-                      variant="primary" 
-                      onClick={() => {
-                        setQuizSubmitted(false);
-                        setQuizAnswers({});
-                        setQuizScore(null);
-                      }}
-                      className="mt-3"
-                    >
-                      Retake Quiz
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="quiz-questions">
-                    <h4 className="mb-4">{quiz.title}</h4>
-                    <p className="mb-4">{quiz.description}</p>
-                    
-                    <form>
-                      {quiz.questions && quiz.questions.length > 0 ? (
-                        quiz.questions.map((question, index) => (
-                          <div key={question._id || index} className="mb-4">
-                            <h5>{index + 1}. {question.text}</h5>
-                            <div className="mt-2">
-                              {Array.isArray(question.options) ? 
-                                question.options.map((option, optIndex) => renderQuizOption(question, option, optIndex)) :
-                                <p>No options available for this question.</p>
-                              }
-                            </div>
-                            {question.explanation && (
-                              <div className="mt-2 text-muted">
-                                <small><strong>Explanation:</strong> {question.explanation}</small>
-                              </div>
-                            )}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="alert alert-warning">
-                          No questions available for this quiz.
-                        </div>
-                      )}
-                      
-                      <div className="d-flex justify-content-end mt-4">
-                        <Button 
-                          variant="primary" 
-                          onClick={handleQuizSubmit}
-                          disabled={Object.keys(quizAnswers).length < quiz.questions.length}
-                        >
-                          Submit Quiz
-                        </Button>
-                      </div>
-                    </form>
-                  </div>
-                )
-              ) : (
-                // Quiz is locked until video and audio are completed
-                <div className="text-center py-5">
-                  <div className="mb-4">
-                    <i className="bi bi-lock-fill" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                  </div>
-                  <h4>Quiz Locked</h4>
-                  <p className="mt-3">
-                    You need to complete the following before accessing the quiz:
-                  </p>
-                  <ul className="list-group mt-3 mb-4 mx-auto" style={{ maxWidth: '400px' }}>
-                    {section.videoUrl && sectionProgress && !sectionProgress.videoWatched && (
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Watch the video</span>
-                        <span className="badge bg-secondary rounded-pill">
-                          <i className="bi bi-x-lg"></i>
-                        </span>
-                      </li>
-                    )}
-                    {section.audioUrl && sectionProgress && !sectionProgress.audioListened && (
-                      <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Listen to the audio</span>
-                        <span className="badge bg-secondary rounded-pill">
-                          <i className="bi bi-x-lg"></i>
-                        </span>
-                      </li>
-                    )}
-                  </ul>
-                  <Button 
-                    variant="outline-primary" 
-                    onClick={() => {
-                      if (section.videoUrl && sectionProgress && !sectionProgress.videoWatched) {
-                        setActiveTab('video');
-                      } else if (section.audioUrl && sectionProgress && !sectionProgress.audioListened) {
-                        setActiveTab('audio');
-                      }
-                    }}
-                  >
-                    Go to {section.videoUrl && sectionProgress && !sectionProgress.videoWatched ? 'Video' : 'Audio'} Content
-                  </Button>
-                </div>
-              )}
+              {renderQuizContent()}
             </div>
           )}
           

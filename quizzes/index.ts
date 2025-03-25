@@ -9,6 +9,7 @@ import keyResponsibilities from './keyResponsibilities';
 import infectionControl from './infectionControl';
 import emergencyProcedures from './emergencyProcedures';
 import clientRights from './clientRights';
+import masterSupportStaff from './masterSupportStaff';
 
 export const quizzes: Record<string, Quiz> = {
   introToCaregiving,
@@ -20,7 +21,8 @@ export const quizzes: Record<string, Quiz> = {
   keyResponsibilities,
   infectionControl,
   emergencyProcedures,
-  clientRights
+  clientRights,
+  masterSupportStaff
 };
 
 export const getQuizByKey = (key: string): Quiz | undefined => {

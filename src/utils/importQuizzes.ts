@@ -19,7 +19,8 @@ const quizToSectionMap: Record<string, string> = {
   keyResponsibilities: 'Key Responsibilities of Support Staff',
   infectionControl: 'Infection Control and Hygiene Practices',
   emergencyProcedures: 'Emergency Procedures and Crisis Management',
-  clientRights: 'Client Rights'
+  clientRights: 'Client Rights',
+  masterSupportStaff: 'Master Being a Support Staff'
 };
 
 // Connect to MongoDB
