@@ -164,7 +164,7 @@ const seedDatabase = async () => {
           </ul>
         `,
         videoUrl: 'https://youtu.be/TAXr3rWMYxQ',
-        audioUrl: '/audio/client-needs.mp3',
+        audioUrl: '/client/public/audio/Understanding_Client_Needs_and_Rights.wav',
         order: 2,
         course: course._id,
       },
@@ -200,8 +200,8 @@ const seedDatabase = async () => {
             <li>Following emergency procedures</li>
           </ul>
         `,
-        videoUrl: '/videos/key-responsibilities.mp4',
-        audioUrl: '/audio/key-responsibilities.mp3',
+        videoUrl: 'https://youtu.be/RxbPrvyHyxQ',
+        audioUrl: '/client/public/audio/Direct Support Staff_ Key Responsibilities.wav',
         order: 3,
         course: course._id,
       },
@@ -238,8 +238,8 @@ const seedDatabase = async () => {
             <li>Supporting communication among team members</li>
           </ul>
         `,
-        videoUrl: '/videos/communication.mp4',
-        audioUrl: '/audio/communication.mp3',
+        videoUrl: 'https://youtu.be/bSQ53FXO-cU',
+        audioUrl: '/client/public/audio/Effective_Communication_in_Support_Roles.wav',
         order: 4,
         course: course._id,
       },
@@ -273,8 +273,8 @@ const seedDatabase = async () => {
             <li>Laundering of linens and clothing according to guidelines</li>
           </ul>
         `,
-        videoUrl: '/videos/infection-control.mp4',
-        audioUrl: '/audio/infection-control.mp3',
+        videoUrl: 'https://youtu.be/S3jjur8J2r4',
+        audioUrl: '/client/public/audio/Support_Staff_Hygiene_and_Infection_Control.wav',
         order: 5,
         course: course._id,
       },
@@ -317,8 +317,8 @@ const seedDatabase = async () => {
             <li>Follow-up procedures</li>
           </ul>
         `,
-        videoUrl: '/videos/emergency-procedures.mp4',
-        audioUrl: '/audio/emergency-procedures.mp3',
+        videoUrl: 'https://youtu.be/7P-YMPl_4ig',
+        audioUrl: 'client/public/audio/Emergency_Preparedness_Guide_for_Support_Staff.wav',
         order: 6,
         course: course._id,
       },
@@ -435,8 +435,8 @@ const seedDatabase = async () => {
             <li>Tracking of errors by type to improve training and procedures</li>
           </ul>
         `,
-        videoUrl: '/videos/medication-administration.mp4',
-        audioUrl: '/audio/medication-administration.mp3',
+        videoUrl: 'https://youtu.be/4bHtI-pCeEo',
+        audioUrl: '/client/public/audio/Six_Rights_of_Medication_Administration.wav',
         order: 7,
         course: course._id,
       },
