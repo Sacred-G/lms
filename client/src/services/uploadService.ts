@@ -51,23 +51,23 @@ export const uploadService = {
   
   // Get list of available audio files
   getAudioFiles: async (): Promise<string[]> => {
-    // This is a placeholder - in a real implementation, you would have an endpoint
-    // that returns a list of available audio files
-    return [
-      '/audio/introduction_to_the_role.wav',
-      '/audio/Direct Support Staff_ Key Responsibilities.wav',
-      '/audio/Mastering Client Rights_ Support Staff Guide.wav'
-    ];
+    try {
+      const response = await api.get('/upload/audio-files');
+      return response.data.files || [];
+    } catch (error) {
+      console.error('Error fetching audio files:', error);
+      return [];
+    }
   },
   
   // Get list of available video files
   getVideoFiles: async (): Promise<string[]> => {
-    // This is a placeholder - in a real implementation, you would have an endpoint
-    // that returns a list of available video files
-    return [
-      'https://youtu.be/cQW6vgsVjY8',
-      'https://youtu.be/TAXr3rWMYxQ',
-      'https://youtu.be/fWWNTxrGAWw'
-    ];
+    try {
+      const response = await api.get('/upload/video-files');
+      return response.data.files || [];
+    } catch (error) {
+      console.error('Error fetching video files:', error);
+      return [];
+    }
   }
 };

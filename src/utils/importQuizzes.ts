@@ -8,17 +8,15 @@ import { Quiz as QuizData, QuizQuestion, QuizOption } from '../../quizzes/types'
 // Load environment variables
 dotenv.config();
 
-// Map quiz keys to section titles
+// Map quiz keys to section titles - ensure each section has a unique quiz
 const quizToSectionMap: Record<string, string> = {
-  introToCaregiving: 'Introduction to the Role',
+  // Use the most appropriate quiz for each section
+  introductionToTheRole: 'Introduction to the Role',
   safetyProtocols: 'Emergency Procedures and Crisis Management',
   communicationBasics: 'Communication and Professionalism',
-  personalCareTechniques: 'Key Responsibilities of Support Staff',
-  introductionToTheRole: 'Introduction to the Role',
-  understandingClientNeeds: 'Understanding Client Needs and Preferences',
   keyResponsibilities: 'Key Responsibilities of Support Staff',
+  understandingClientNeeds: 'Understanding Client Needs and Preferences',
   infectionControl: 'Infection Control and Hygiene Practices',
-  emergencyProcedures: 'Emergency Procedures and Crisis Management',
   clientRights: 'Client Rights',
   masterSupportStaff: 'Master Being a Support Staff'
 };

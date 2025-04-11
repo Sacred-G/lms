@@ -374,7 +374,7 @@ const SectionDetail: React.FC<SectionDetailProps> = () => {
                     <p>No options available for this question.</p>
                   }
                 </div>
-                {question.explanation && (
+                {quizSubmitted && question.explanation && (
                   <div className="mt-2 text-muted">
                     <small><strong>Explanation:</strong> {question.explanation}</small>
                   </div>

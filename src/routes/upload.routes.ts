@@ -5,7 +5,9 @@ import {
   uploadAudio, 
   uploadVideo, 
   registerExternalAudioUrl, 
-  registerExternalVideoUrl 
+  registerExternalVideoUrl,
+  getAudioFiles,
+  getVideoFiles
 } from '../controllers/upload.controller';
 import { protect, restrictTo } from '../middleware/auth.middleware';
 
@@ -37,5 +39,9 @@ router.post('/external-audio', registerExternalAudioUrl);
 // Video upload routes
 router.post('/video', upload.single('video'), uploadVideo);
 router.post('/external-video', registerExternalVideoUrl);
+
+// File listing routes
+router.get('/audio-files', getAudioFiles);
+router.get('/video-files', getVideoFiles);
 
 export default router;

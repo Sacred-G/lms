@@ -7,7 +7,7 @@ const getBaseUrl = () => {
     return '/api'; // Nginx will proxy this to the backend service
   }
   // In development, use the proxy defined in package.json
-  return 'http://localhost:3001/api';
+  return 'http://localhost:3002/api';
 };
 
 // Create an axios instance with default config

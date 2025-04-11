@@ -13,6 +13,11 @@ export const adminService = {
   },
   
   // Progress management
+  deleteProgressForDeletedUsers: async () => {
+    const { data } = await api.delete('/admin/progress/deleted-users');
+    return data;
+  },
+  
   getAllProgress: async (filters?: { userId?: string; courseId?: string; completed?: boolean }) => {
     const queryParams = new URLSearchParams();
     

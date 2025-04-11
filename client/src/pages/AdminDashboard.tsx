@@ -74,6 +74,7 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deletingProgress, setDeletingProgress] = useState(false);
   
   // Filters for progress
   const [selectedUser, setSelectedUser] = useState<string>('');
@@ -179,6 +180,32 @@ const AdminDashboard: React.FC = () => {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // Handle deleting progress records for deleted users
+  const handleDeleteProgressForDeletedUsers = async () => {
+    try {
+      setDeletingProgress(true);
+      setError(null);
+      
+      const result = await adminService.deleteProgressForDeletedUsers();
+      
+      // Refresh progress data
+      const progressData = await adminService.getAllProgress();
+      setProgress(progressData);
+      
+      setSuccessMessage(result.message);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      setError('Failed to delete progress records for deleted users');
+      console.error(err);
+    } finally {
+      setDeletingProgress(false);
     }
   };
 
@@ -311,6 +338,21 @@ const AdminDashboard: React.FC = () => {
           <Card className="shadow-sm">
             <Card.Body>
               <h4 className="mb-3">Student Progress</h4>
+              
+              {/* Action buttons */}
+              <div className="mb-3">
+                <Button 
+                  variant="danger" 
+                  onClick={handleDeleteProgressForDeletedUsers}
+                  disabled={deletingProgress}
+                  className="me-2"
+                >
+                  {deletingProgress ? 'Removing...' : 'Remove Deleted Users'}
+                </Button>
+                <small className="text-muted">
+                  This will permanently remove all progress records for deleted users.
+                </small>
+              </div>
               
               {/* Filters */}
               <Row className="mb-4">

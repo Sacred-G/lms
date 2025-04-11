@@ -4,7 +4,8 @@ import {
   getAllUsers,
   updateUserRole,
   getAllProgress,
-  getStatistics
+  getStatistics,
+  deleteProgressForDeletedUsers
 } from '../controllers/admin.controller';
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.patch('/users/:userId/role', updateUserRole);
 
 // Progress management routes
 router.get('/progress', getAllProgress);
+router.delete('/progress/deleted-users', deleteProgressForDeletedUsers);
 
 // Statistics routes
 router.get('/statistics', getStatistics);

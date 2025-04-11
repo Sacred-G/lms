@@ -151,6 +151,62 @@ export const registerExternalVideoUrl = async (req: Request, res: Response): Pro
   }
 };
 
+// Get list of available audio files
+export const getAudioFiles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const audioDir = path.join(__dirname, '../../client/public/audio');
+    
+    // Check if directory exists
+    if (!fs.existsSync(audioDir)) {
+      res.status(200).json({ files: [] });
+      return;
+    }
+    
+    // Read all files in the directory
+    const files = fs.readdirSync(audioDir);
+    
+    // Filter for audio files and format the paths
+    const audioFiles = files
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        return ['.wav', '.mp3', '.ogg', '.mpeg'].includes(ext);
+      })
+      .map(file => `/audio/${file}`);
+    
+    res.status(200).json({ files: audioFiles });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get list of available video files
+export const getVideoFiles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const videoDir = path.join(__dirname, '../../client/public/videos');
+    
+    // Check if directory exists
+    if (!fs.existsSync(videoDir)) {
+      res.status(200).json({ files: [] });
+      return;
+    }
+    
+    // Read all files in the directory
+    const files = fs.readdirSync(videoDir);
+    
+    // Filter for video files and format the paths
+    const videoFiles = files
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase();
+        return ['.mp4', '.webm', '.ogg'].includes(ext);
+      })
+      .map(file => `/videos/${file}`);
+    
+    res.status(200).json({ files: videoFiles });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Handle file upload for video files
 export const uploadVideo = async (req: MulterRequest, res: Response): Promise<void> => {
   try {

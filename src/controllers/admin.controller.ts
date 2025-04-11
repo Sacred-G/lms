@@ -3,6 +3,7 @@ import User from '../models/user.model';
 import Course from '../models/course.model';
 import Section from '../models/section.model';
 import Progress from '../models/progress.model';
+import mongoose from 'mongoose';
 
 // Get all users
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
@@ -37,6 +38,34 @@ export const updateUserRole = async (req: Request, res: Response): Promise<void>
     }
 
     res.status(200).json(user);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete progress records for deleted users
+export const deleteProgressForDeletedUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Find all progress records
+    const allProgress = await Progress.find().populate('user', '_id');
+    
+    // Filter progress records where user is null (deleted)
+    const deletedUserProgressIds = allProgress
+      .filter(record => !record.user)
+      .map(record => record._id);
+    
+    if (deletedUserProgressIds.length === 0) {
+      res.status(200).json({ message: 'No progress records for deleted users found' });
+      return;
+    }
+    
+    // Delete all progress records for deleted users
+    const result = await Progress.deleteMany({ _id: { $in: deletedUserProgressIds } });
+    
+    res.status(200).json({ 
+      message: `Successfully removed ${result.deletedCount} progress records for deleted users`,
+      deletedCount: result.deletedCount
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
